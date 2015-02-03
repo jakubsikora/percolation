@@ -5,6 +5,7 @@ public class Percolation {
     private WeightedQuickUnionUF uf;
     private int vTop;
     private int vBottom;
+    private int open = 1;
     
     // create N-by-N grid, with all sites blocked 
     public Percolation(int N) {
@@ -17,13 +18,6 @@ public class Percolation {
         
         // Create the NxN grid
         grid = new int[n][n];
-        
-        // Close all sites
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                grid[i][j] = 0;
-            }
-        }
         
         // Add virtual top and bottom sites
         // Create N*N + 2 components
@@ -53,7 +47,7 @@ public class Percolation {
         }
         
         if (!isOpen(i, j)) {
-            grid[i-1][j-1] = 1;
+            grid[i-1][j-1] = open;
             
             // If first row connect with top virtual
             if (i == 1) {
@@ -108,11 +102,7 @@ public class Percolation {
               "column index j out of bounds");
         }
         
-        if (grid[i-1][j-1] == 1) {
-            return true;
-        }
-        
-        return false;
+        return grid[i-1][j-1] == open;
     }
        
     // is site (row i, column j) full?    
@@ -128,11 +118,7 @@ public class Percolation {
               "column index j out of bounds");
         }
         
-        if (grid[i-1][j-1] == 0) {
-            return true;
-        }
-        
-        return false;
+        return uf.connected(vTop, xyTo1D(i, j));
     }
        
     // does the system percolate?    
