@@ -27,7 +27,7 @@ public class PercolationStats {
                 row = StdRandom.uniform(N) + 1;
                 column = StdRandom.uniform(N) + 1;
                 
-                if (perc.isFull(row, column)) {
+                if (!perc.isOpen(row, column)) {
                     perc.open(row, column);
                     opened++;
                 }
@@ -61,8 +61,6 @@ public class PercolationStats {
     public static void main(String[] args) {
         int N = Integer.parseInt(args[0]);
         int T = Integer.parseInt(args[1]);
-        
-        StdOut.println(N + " " + T);
         
         PercolationStats ps = new PercolationStats(N, T);
         

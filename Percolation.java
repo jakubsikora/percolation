@@ -3,13 +3,14 @@ public class Percolation {
     private int[][] grid;
     private int n;
     private WeightedQuickUnionUF uf;
+    private WeightedQuickUnionUF uf2;
     private int vTop;
     private int vBottom;
     private int open = 1;
     
     // create N-by-N grid, with all sites blocked 
     public Percolation(int N) {
-        if (N < 0) {
+        if (N <= 0) {
              throw new java.lang.IllegalArgumentException();
         }
         
@@ -22,6 +23,9 @@ public class Percolation {
         // Add virtual top and bottom sites
         // Create N*N + 2 components
         uf = new WeightedQuickUnionUF((n * n) + 2);
+        
+        // Backwash fix
+        uf2 = new WeightedQuickUnionUF((n * n) + 1);
         
         // Index of virtual sites
         vTop = 0;
@@ -52,6 +56,7 @@ public class Percolation {
             // If first row connect with top virtual
             if (i == 1) {
                 uf.union(xyTo1D(i, j), vTop);
+                uf2.union(xyTo1D(i, j), vTop);
             }
             
             // If last row connect with bottom virtual
@@ -63,6 +68,7 @@ public class Percolation {
             if (i-1 >= 1) { 
                 if (grid[i-2][j-1] == 1) {
                     uf.union(xyTo1D(i, j), xyTo1D(i-1, j)); 
+                    uf2.union(xyTo1D(i, j), xyTo1D(i-1, j)); 
                 }
             }           
             
@@ -70,6 +76,7 @@ public class Percolation {
             if (j+1 <= n) {
                 if (grid[i-1][j] == 1) {
                     uf.union(xyTo1D(i, j), xyTo1D(i, j+1)); 
+                    uf2.union(xyTo1D(i, j), xyTo1D(i, j+1)); 
                 }
             }
             
@@ -77,6 +84,7 @@ public class Percolation {
             if (i+1 <= n) {
                 if (grid[i][j-1] == 1) {
                     uf.union(xyTo1D(i, j), xyTo1D(i+1, j)); 
+                    uf2.union(xyTo1D(i, j), xyTo1D(i+1, j)); 
                 }
             }
             
@@ -84,6 +92,7 @@ public class Percolation {
             if (j-1 >= 1) {
                 if (grid[i-1][j-2] == 1) {
                     uf.union(xyTo1D(i, j), xyTo1D(i, j-1)); 
+                    uf2.union(xyTo1D(i, j), xyTo1D(i, j-1)); 
                 }
             }
         }
@@ -118,7 +127,7 @@ public class Percolation {
               "column index j out of bounds");
         }
         
-        return uf.connected(vTop, xyTo1D(i, j));
+        return uf2.connected(vTop, xyTo1D(i, j));
     }
        
     // does the system percolate?    
@@ -128,7 +137,7 @@ public class Percolation {
 
     // test client (optional)    
     public static void main(String[] args) {
-        int N = 5;
+        int N = 3;
         int row;
         int column;
         
@@ -139,7 +148,7 @@ public class Percolation {
             row = StdRandom.uniform(N) + 1;
             column = StdRandom.uniform(N) + 1;
             
-            if (perc.isFull(row, column)) {
+            if (!perc.isOpen(row, column)) {
                 perc.open(row, column);
             }
         }
